@@ -1,31 +1,41 @@
 import 'package:bloc/bloc.dart';
+import 'package:cubitpractice/domain/cubit_state.dart';
 import 'package:cubitpractice/domain/todo_state.dart';
 import 'package:cubitpractice/models/todo_model.dart';
 
-class ToDoCubit extends Cubit<TodoState> {
-  ToDoCubit() : super(TodoState.initial());
-  //logic ya function
+class ToDoCubit extends Cubit<CubitState<TodoState>> {
+  ToDoCubit() : super(const InitialState());
 
+  //logic ya function
+  final List<ToDoModel> tempList = [];
   void addTodos({required String name, required String email}) {
-    final tempList = [...state.todos];
+    emit(const LoadingState());
+
     tempList.add(ToDoModel(name: name, email: email));
-    // tempList.add(email);
     print(tempList);
-    emit(state.copyWith(todos: tempList));
+
+    final todoState = TodoState(todos: [...tempList]);
+
+    emit(LoadedState(todoState));
   }
 
   void deleteTodos({required int index}) {
-    final deleteListTemp = [...state.todos];
-    deleteListTemp.removeAt(index);
-    emit(state.copyWith(todos: deleteListTemp));
+    emit(const LoadingState());
+
+    tempList.removeAt(index);
+    final deleteState = TodoState(todos: [...tempList]);
+
+    emit(LoadedState(deleteState));
   }
 
   void updateTodos(
       {required int index, required String name, required String email}) {
-    final updatedList = [...state.todos];
+    emit(const LoadingState());
 
-    updatedList[index] = ToDoModel(name: name, email: email);
-    print("updatedList : $updatedList");
-    emit(state.copyWith(todos: updatedList));
+    tempList[index] = ToDoModel(name: name, email: email);
+    final updatedState = TodoState(todos: [...tempList]);
+    print("updatedList : $tempList");
+
+    emit(LoadedState(updatedState));
   }
 }
